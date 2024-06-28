@@ -36,7 +36,7 @@ void UpdateTargetTemperature()
     }
   }
   if (ManualOverride == ON)
-    TargetTemp = ManOverrideTemp;
+    // TargetTemp = ManOverrideTemp;
   Serial.println("Target Temperature = " + String(TargetTemp, 1) + "°");
 }
 
@@ -172,8 +172,8 @@ void CheckTimerEvent()
   }
   if (ManualOverride == ON)
   {                               // If manual override is enabled then turn the heating on
-    TargetTemp = ManOverrideTemp; // Set the target temperature to the manual overide temperature
-    ControlHeating();             // Control the heating as normal
+    //TargetTemp = ManOverrideTemp; // Set the target temperature to the manual overide temperature
+    //ControlHeating();             // Control the heating as normal
   }
   else
   {

@@ -51,96 +51,100 @@
 25	ARDUINO_EVENT_MAX	
 */
 
-void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info){
-    #ifdef DEBUG_FUNC
-      Serial.println(__func__);
-    #endif
-  connections+=1;
-  Serial.println("Connected to AP successfully!");
-}
+  #ifdef WIFI_S
 
-void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info){
-    #ifdef DEBUG_FUNC
-      Serial.println(__func__);
-    #endif
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-}
+  void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info){
+      #ifdef DEBUG_FUNC
+        Serial.println(__func__);
+      #endif
+    connections+=1;
+    Serial.println("Connected to AP successfully!");
+  }
 
-void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
-    #ifdef DEBUG_FUNC
-      Serial.println(__func__);
-    #endif
-  Serial.println("Disconnected from WiFi access point");
-  Serial.print("WiFi lost connection. Reason: ");
-  Serial.println(info.wifi_sta_disconnected.reason);
-  Serial.println("Trying to Reconnect");
-  WiFi.begin(ssid, password);
-}
+  void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info){
+      #ifdef DEBUG_FUNC
+        Serial.println(__func__);
+      #endif
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
 
-void initWiFi()
-{
-    #ifdef DEBUG_FUNC
-      Serial.println(__func__);
-    #endif
-  Serial.print("\r\nConnecting to: ");
-  Serial.println(String(ssid));
+  void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
+      #ifdef DEBUG_FUNC
+        Serial.println(__func__);
+      #endif
+    Serial.println("Disconnected from WiFi access point");
+    Serial.print("WiFi lost connection. Reason: ");
+    Serial.println(info.wifi_sta_disconnected.reason);
+    Serial.println("Trying to Reconnect");
+    WiFi.begin(ssid, password);
+  }
 
-  IPAddress primaryDNS(8, 8, 8, 8);   //  Use Google as DNS
-
-  WiFi.disconnect();
-
-//   WiFi.softAP(ssid, password);
-//   WiFi.onEvent(WiFiStationConnected, SYSTEM_EVENT_AP_STACONNECTED);
-
-  WiFi.mode(WIFI_MODE_APSTA); // switch off AP
-//   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
-//   WiFi.setHostname(hostname.c_str()); //define hostname
-  WiFi.setAutoReconnect(true);
-
-  WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
-  WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
-  WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
-
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
+  void initWiFi()
   {
-    Serial.print(".");
-    delay(1000);
-  }
+      #ifdef DEBUG_FUNC
+        Serial.println(__func__);
+      #endif
+    Serial.print("\r\nConnecting to: ");
+    Serial.println(String(ssid));
 
-  Serial.println("\nWiFi connected at: " + WiFi.localIP().toString());
-  Serial.print("RRSI: ");
-  Serial.println(WiFi.RSSI());
-}
+    IPAddress primaryDNS(8, 8, 8, 8);   //  Use Google as DNS
 
-void scanNetwork(){
-    #ifdef DEBUG_FUNC
-      Serial.println(__func__);
-    #endif
-    Serial.println("scan start");
+    WiFi.disconnect();
 
-  // WiFi.scanNetworks will return the number of networks found
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0) {
-      Serial.println("no networks found");
-  } else {
-    Serial.print(n);
-    Serial.println(" networks found");
-    for (int i = 0; i < n; ++i) {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
-      delay(10);
+  //   WiFi.softAP(ssid, password);
+  //   WiFi.onEvent(WiFiStationConnected, SYSTEM_EVENT_AP_STACONNECTED);
+
+    WiFi.mode(WIFI_MODE_APSTA); // switch off AP
+  //   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  //   WiFi.setHostname(hostname.c_str()); //define hostname
+    WiFi.setAutoReconnect(true);
+
+    WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
+    WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
+    WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      Serial.print(".");
+      delay(1000);
     }
+
+    Serial.println("\nWiFi connected at: " + WiFi.localIP().toString());
+    Serial.print("RRSI: ");
+    Serial.println(WiFi.RSSI());
   }
-  Serial.println("");
-}
+
+  void scanNetwork(){
+      #ifdef DEBUG_FUNC
+        Serial.println(__func__);
+      #endif
+      Serial.println("scan start");
+
+    // WiFi.scanNetworks will return the number of networks found
+    int n = WiFi.scanNetworks();
+    Serial.println("scan done");
+    if (n == 0) {
+        Serial.println("no networks found");
+    } else {
+      Serial.print(n);
+      Serial.println(" networks found");
+      for (int i = 0; i < n; ++i) {
+        // Print SSID and RSSI for each network found
+        Serial.print(i + 1);
+        Serial.print(": ");
+        Serial.print(WiFi.SSID(i));
+        Serial.print(" (");
+        Serial.print(WiFi.RSSI(i));
+        Serial.print(")");
+        Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+        delay(10);
+      }
+    }
+    Serial.println("");
+  }
+  #endif
+  
 #endif

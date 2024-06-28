@@ -99,7 +99,12 @@ void append_HTML_footer() {
 }
 
 void homepage() {
-  Temperature = readSensorComplete();
+  #ifdef TEMP_S
+    Temperature = readSensorComplete();
+  #else
+    Temperature = 0;
+  #endif
+
   append_HTML_header(Refresh);
   webpage += "<h2>Temperature and Relay status</h2><br>";
   webpage += "<div class='numberCircle'><span class=" + String((RelayState == "ON" ? "'on'>" : "'off'>")) + String(Temperature, 1) + "&deg;</span></div><br><br><br>";

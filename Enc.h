@@ -8,7 +8,14 @@
 #include "pins.h"
 #include "menu.h"
 
-//#define DEBUG 1    // SET TO 0 OUT TO REMOVE TRACES
+
+
+#ifdef ENC_S
+  EncButton en(CLK, DT, SW);
+  
+bool updateTemp = false;
+
+
 
 #if DEBUG
 #define D_SerialBegin(...) Serial.begin(__VA_ARGS__);
@@ -23,12 +30,6 @@
 #endif
 
 #define MAX_TEMP_LIMIT 60
-
-EncButton en(CLK, DT, SW);
-bool updateTemp = false;
-
-
-// uint8_t enc_pre;
 
 void encoder_setup(){
   
@@ -56,17 +57,26 @@ void read_encoder(){
     if(en.leftH()){
       if(menu.curr == Heat && TargetTemp > 0){
         updateTemp = true;
-        TargetTemp -= 1;
-        D_println(TargetTemp);
-      }else{
-        D_println("WRN: cant set below zero temp");
+        TargetTemp -= 0.5;
+      }else if(menu.curr == Cooling && FrostTemp > 0){
+        updateTemp = true;
+        FrostTemp -= 0.5;
+        TempSetC->val->setfloat(TempSetC->val, FrostTemp);
+        menu.lineUpdate(&menu, TempSetC);
+
       }
     }
     else if(en.rightH()){
       if(menu.curr == Heat && TargetTemp < MAX_TEMP_LIMIT){
         updateTemp = true;
-        TargetTemp += 1;
-        D_println(TargetTemp);
+        TargetTemp += 0.5;
+        Serial.println(TargetTemp);
+      }else if(menu.curr == Cooling && FrostTemp > 0){
+        updateTemp = true;
+        FrostTemp += 0.5;
+        TempSetC->val->setfloat(TempSetC->val, FrostTemp);
+        menu.lineUpdate(&menu, TempSetC);
+
       }
     }
 
@@ -89,9 +99,12 @@ void read_encoder(){
   if(updateTemp){
     updateTemp = false;
     TempSetH->val->setfloat(TempSetH->val, TargetTemp);
-    FLAG_LCD = true;
+    menu.lineUpdate(&menu, TempSetH);
   }
 }
+
+#endif
+
 
 
 #endif
